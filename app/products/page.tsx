@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { products, categories } from "@/lib/data";
 import { ProductCard } from "@/components/ui/ProductCard";
 import { SearchBar } from "@/components/ui/SearchBar";
 import { Pagination } from "@/components/ui/Pagination";
+import { client } from "@/lib/sanity";
 
 const ITEMS_PER_PAGE = 8;
 
@@ -12,7 +13,16 @@ export default function ProductsPage() {
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<"price-asc" | "price-desc" | "rating">("rating");
   const [selectedCategory, setSelectedCategory] = useState("all");
+
+
   const [page, setPage] = useState(1);
+  useEffect(() => {
+    async function getProducts() {
+  return await client.fetch(`*[_type == "product"]`);
+}
+  }, []);
+  
+
 
   const filteredProducts = useMemo(() => {
     let result = products.filter((p) =>

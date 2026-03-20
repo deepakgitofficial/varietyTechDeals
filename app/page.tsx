@@ -8,9 +8,22 @@ import { BlogCard } from "@/components/ui/BlogCard";
 import { Newsletter } from "@/components/ui/Newsletter";
 import { ComparisonTable } from "@/components/ui/ComparisonTable";
 import { Badge } from "@/components/ui/badge";
-import { products, categories, blogPosts } from "@/lib/data";
+import { getProducts, getCategories } from "@/lib/sanity";
+import { mapSanityProduct, mapSanityCategory } from "@/lib/sanityMapper";
+import { blogPosts } from "@/lib/data";
 
-export default function Home() {
+export const revalidate = 60; // ISR: revalidate every 60 seconds
+
+export default async function Home() {
+  // Fetch live data from Sanity
+  const [rawProducts, rawCategories] = await Promise.all([
+    getProducts(),
+    getCategories(),
+  ]);
+
+  const products = rawProducts.map(mapSanityProduct).filter(Boolean);
+  const categories = rawCategories.map(mapSanityCategory).filter(Boolean);
+
   const featuredProducts = products.filter((p) => p.isPopular);
   const newProducts = products.filter((p) => p.isNew);
   const topPicks = products.slice(0, 3); // Top 3 for comparison
@@ -127,25 +140,27 @@ export default function Home() {
       </section>
 
       {/* ===== TOP PICKS FOR 2026 ===== */}
-      <section className="py-16 md:py-20">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="text-center mb-12">
-            <Badge className="mb-3">
-              <Award className="w-3 h-3 mr-1" /> Editor&apos;s Choice
-            </Badge>
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
-              Top Picks for 2026
-            </h2>
-            <p className="text-muted-foreground mt-2 max-w-lg mx-auto">
-              Our editors&apos; favorite products this year, compared side by side.
-            </p>
-          </div>
+      {topPicks.length >= 3 && (
+        <section className="py-16 md:py-20">
+          <div className="container mx-auto px-4 md:px-6">
+            <div className="text-center mb-12">
+              <Badge className="mb-3">
+                <Award className="w-3 h-3 mr-1" /> Editor&apos;s Choice
+              </Badge>
+              <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
+                Top Picks for 2026
+              </h2>
+              <p className="text-muted-foreground mt-2 max-w-lg mx-auto">
+                Our editors&apos; favorite products this year, compared side by side.
+              </p>
+            </div>
 
-          <div className="bg-card border rounded-xl p-4 md:p-6 overflow-hidden">
-            <ComparisonTable products={topPicks} />
+            <div className="bg-card border rounded-xl p-4 md:p-6 overflow-hidden">
+              <ComparisonTable products={topPicks} />
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ===== NEW ARRIVALS ===== */}
       <section className="py-16 md:py-20 bg-muted/30">

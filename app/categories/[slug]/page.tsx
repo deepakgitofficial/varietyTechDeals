@@ -1,113 +1,34 @@
-"use client";
+import { getCategories, getProductsByCategory, getCategoryBySlug } from "@/lib/sanity";
+import { mapSanityProduct, mapSanityCategory } from "@/lib/sanityMapper";
+import CategoryClient from "./CategoryClient";
 
-import { useState, useMemo } from "react";
-import { useParams } from "next/navigation";
-import Link from "next/link";
-import { ChevronLeft } from "lucide-react";
-import { categories, products } from "@/lib/data";
-import { ProductCard } from "@/components/ui/ProductCard";
-import { SearchBar } from "@/components/ui/SearchBar";
-import { Pagination } from "@/components/ui/Pagination";
-import { Button } from "@/components/ui/button";
+export const revalidate = 60;
 
-const ITEMS_PER_PAGE = 6;
+// Generate static paths for all categories from Sanity
+export async function generateStaticParams() {
+  const categories = await getCategories();
+  return categories
+    .filter((c) => c.slug?.current)
+    .map((c) => ({
+      slug: c.slug.current,
+    }));
+}
 
-export default function CategoryPage() {
-  const params = useParams<{ slug: string }>();
-  const slug = params.slug;
+export default async function CategoryPage({ params }) {
+  const { slug } = await params;
 
-  const category = categories.find((c) => c.slug === slug);
-  const categoryProducts = products.filter(
-    (p) => p.category.toLowerCase() === (category?.name.toLowerCase() ?? "")
-  );
+  const [rawCategory, rawProducts] = await Promise.all([
+    getCategoryBySlug(slug),
+    getProductsByCategory(slug),
+  ]);
 
-  const [search, setSearch] = useState("");
-  const [sortBy, setSortBy] = useState<"price-asc" | "price-desc" | "rating">("rating");
-  const [page, setPage] = useState(1);
-
-  const filteredProducts = useMemo(() => {
-    let result = categoryProducts.filter((p) =>
-      p.title.toLowerCase().includes(search.toLowerCase())
-    );
-    if (sortBy === "price-asc") result.sort((a, b) => a.price - b.price);
-    else if (sortBy === "price-desc") result.sort((a, b) => b.price - a.price);
-    else result.sort((a, b) => b.rating - a.rating);
-    return result;
-  }, [search, sortBy, categoryProducts]);
-
-  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
-  const paged = filteredProducts.slice(
-    (page - 1) * ITEMS_PER_PAGE,
-    page * ITEMS_PER_PAGE
-  );
+  const category = mapSanityCategory(rawCategory);
+  const products = rawProducts.map(mapSanityProduct).filter(Boolean);
 
   if (!category) {
-    return (
-      <div className="container mx-auto px-4 md:px-6 py-20 text-center">
-        <h1 className="text-2xl font-bold mb-4">Category not found</h1>
-        <Button asChild>
-          <Link href="/categories">Back to Categories</Link>
-        </Button>
-      </div>
-    );
+    const { notFound } = await import("next/navigation");
+    notFound();
   }
 
-  return (
-    <div className="container mx-auto px-4 md:px-6 py-12 md:py-20">
-      {/* Breadcrumb */}
-      <Link
-        href="/categories"
-        className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-8 transition-colors"
-      >
-        <ChevronLeft className="w-4 h-4" />
-        All Categories
-      </Link>
-
-      <div className="mb-10">
-        <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-2">
-          {category.name}
-        </h1>
-        <p className="text-lg text-muted-foreground">{category.description}</p>
-      </div>
-
-      {/* Filters */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-8">
-        <SearchBar
-          onSearch={(q) => {
-            setSearch(q);
-            setPage(1);
-          }}
-          placeholder={`Search ${category.name.toLowerCase()}...`}
-        />
-        <select
-          value={sortBy}
-          onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-          className="px-4 py-2.5 bg-card border border-border rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/50"
-        >
-          <option value="rating">Top Rated</option>
-          <option value="price-asc">Price: Low → High</option>
-          <option value="price-desc">Price: High → Low</option>
-        </select>
-      </div>
-
-      {/* Products Grid */}
-      {paged.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {paged.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-      ) : (
-        <div className="text-center py-16 text-muted-foreground">
-          <p className="text-lg">No products found.</p>
-        </div>
-      )}
-
-      <Pagination
-        currentPage={page}
-        totalPages={totalPages}
-        onPageChange={setPage}
-      />
-    </div>
-  );
+  return <CategoryClient category={category} products={products} />;
 }

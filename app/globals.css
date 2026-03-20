@@ -41,7 +41,7 @@
   --secondary-foreground: #18181b;
 
   --accent: #f4f4f5;
-  --accent-foreground: #18181b;
+  --accent-foreground: #e6e6e6;
 
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
@@ -92,13 +92,16 @@ body {
 ::-webkit-scrollbar {
   width: 8px;
 }
+
 ::-webkit-scrollbar-track {
   background: transparent;
 }
+
 ::-webkit-scrollbar-thumb {
   background: var(--border);
   border-radius: 4px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: var(--muted-foreground);
 }

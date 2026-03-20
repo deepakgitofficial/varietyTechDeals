@@ -3,16 +3,22 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { Star, ShieldCheck, Truck, ChevronLeft, Check, X, ExternalLink } from "lucide-react";
-import { products } from "@/lib/data";
+import { getProducts, getProductBySlug } from "@/lib/sanity";
+import { mapSanityProduct } from "@/lib/sanityMapper";
 import { formatPrice } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
-// Generate static paths for all products
-export function generateStaticParams() {
-  return products.map((product) => ({
-    slug: product.slug,
-  }));
+export const revalidate = 60;
+
+// Generate static paths for all products from Sanity
+export async function generateStaticParams() {
+  const products = await getProducts();
+  return products
+    .filter((p) => p.slug?.current)
+    .map((p) => ({
+      slug: p.slug.current,
+    }));
 }
 
 // Dynamic metadata for SEO
@@ -22,7 +28,8 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const product = products.find((p) => p.slug === slug);
+  const raw = await getProductBySlug(slug);
+  const product = mapSanityProduct(raw);
 
   if (!product) {
     return { title: "Product Not Found" };
@@ -45,7 +52,8 @@ export default async function ProductPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const product = products.find((p) => p.slug === slug);
+  const raw = await getProductBySlug(slug);
+  const product = mapSanityProduct(raw);
 
   if (!product) {
     notFound();
@@ -208,80 +216,90 @@ export default async function ProductPage({
         </div>
 
         {/* Key Features */}
-        <section className="mb-16">
-          <h2 className="text-2xl font-bold tracking-tight mb-6">Key Features</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {product.features.map((feature, i) => (
-              <div
-                key={i}
-                className="flex items-start gap-3 p-4 bg-card border rounded-lg"
-              >
-                <Check className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                <span>{feature}</span>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Specs Table */}
-        <section className="mb-16">
-          <h2 className="text-2xl font-bold tracking-tight mb-6">Specifications</h2>
-          <div className="border rounded-lg overflow-hidden">
-            {Object.entries(product.specs).map(([key, value], i) => (
-              <div
-                key={key}
-                className={`flex justify-between p-4 text-sm ${
-                  i % 2 === 0 ? "bg-muted/30" : ""
-                } ${i < Object.keys(product.specs).length - 1 ? "border-b" : ""}`}
-              >
-                <span className="font-medium">{key}</span>
-                <span className="text-muted-foreground text-right">{value}</span>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Pros & Cons */}
-        <section className="mb-16">
-          <h2 className="text-2xl font-bold tracking-tight mb-6">Our Verdict</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Pros */}
-            <div className="border rounded-lg overflow-hidden">
-              <div className="p-4 bg-green-500/10 border-b border-green-500/20">
-                <h3 className="font-semibold text-green-600 dark:text-green-400 flex items-center gap-2">
-                  <Check className="w-5 h-5" />
-                  Pros
-                </h3>
-              </div>
-              <ul className="p-4 space-y-3">
-                {product.pros.map((pro, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm">
-                    <Check className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                    {pro}
-                  </li>
-                ))}
-              </ul>
+        {product.features.length > 0 && (
+          <section className="mb-16">
+            <h2 className="text-2xl font-bold tracking-tight mb-6">Key Features</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {product.features.map((feature, i) => (
+                <div
+                  key={i}
+                  className="flex items-start gap-3 p-4 bg-card border rounded-lg"
+                >
+                  <Check className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+                  <span>{feature}</span>
+                </div>
+              ))}
             </div>
+          </section>
+        )}
 
-            {/* Cons */}
+        {/* Specs Table — only render if specs data exists */}
+        {Object.keys(product.specs).length > 0 && (
+          <section className="mb-16">
+            <h2 className="text-2xl font-bold tracking-tight mb-6">Specifications</h2>
             <div className="border rounded-lg overflow-hidden">
-              <div className="p-4 bg-red-500/10 border-b border-red-500/20">
-                <h3 className="font-semibold text-red-600 dark:text-red-400 flex items-center gap-2">
-                  <X className="w-5 h-5" />
-                  Cons
-                </h3>
-              </div>
-              <ul className="p-4 space-y-3">
-                {product.cons.map((con, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm">
-                    <X className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />
-                    {con}
-                  </li>
-                ))}
-              </ul>
+              {Object.entries(product.specs).map(([key, value], i) => (
+                <div
+                  key={key}
+                  className={`flex justify-between p-4 text-sm ${
+                    i % 2 === 0 ? "bg-muted/30" : ""
+                  } ${i < Object.keys(product.specs).length - 1 ? "border-b" : ""}`}
+                >
+                  <span className="font-medium">{key}</span>
+                  <span className="text-muted-foreground text-right">{value}</span>
+                </div>
+              ))}
             </div>
-          </div>
-        </section>
+          </section>
+        )}
+
+        {/* Pros & Cons — only render if data exists */}
+        {(product.pros.length > 0 || product.cons.length > 0) && (
+          <section className="mb-16">
+            <h2 className="text-2xl font-bold tracking-tight mb-6">Our Verdict</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Pros */}
+              {product.pros.length > 0 && (
+                <div className="border rounded-lg overflow-hidden">
+                  <div className="p-4 bg-green-500/10 border-b border-green-500/20">
+                    <h3 className="font-semibold text-green-600 dark:text-green-400 flex items-center gap-2">
+                      <Check className="w-5 h-5" />
+                      Pros
+                    </h3>
+                  </div>
+                  <ul className="p-4 space-y-3">
+                    {product.pros.map((pro, i) => (
+                      <li key={i} className="flex items-start gap-2 text-sm">
+                        <Check className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                        {pro}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Cons */}
+              {product.cons.length > 0 && (
+                <div className="border rounded-lg overflow-hidden">
+                  <div className="p-4 bg-red-500/10 border-b border-red-500/20">
+                    <h3 className="font-semibold text-red-600 dark:text-red-400 flex items-center gap-2">
+                      <X className="w-5 h-5" />
+                      Cons
+                    </h3>
+                  </div>
+                  <ul className="p-4 space-y-3">
+                    {product.cons.map((con, i) => (
+                      <li key={i} className="flex items-start gap-2 text-sm">
+                        <X className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />
+                        {con}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          </section>
+        )}
 
         {/* Final CTA banner */}
         <section className="bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20 rounded-xl p-8 md:p-12 text-center">

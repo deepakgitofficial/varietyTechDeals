@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
-import { categories } from "@/lib/data";
+import { getCategories } from "@/lib/sanity";
+import { mapSanityCategory } from "@/lib/sanityMapper";
 import { CategoryCard } from "@/components/ui/CategoryCard";
+
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "Categories",
@@ -8,7 +11,10 @@ export const metadata: Metadata = {
     "Browse our curated categories of tech products — mobiles, laptops, gaming gear, audio, and wearables.",
 };
 
-export default function CategoriesPage() {
+export default async function CategoriesPage() {
+  const rawCategories = await getCategories();
+  const categories = rawCategories.map(mapSanityCategory).filter(Boolean);
+
   return (
     <div className="container mx-auto px-4 md:px-6 py-12 md:py-20">
       <div className="max-w-2xl mb-12">

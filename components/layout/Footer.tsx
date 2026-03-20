@@ -1,5 +1,7 @@
 import Link from "next/link";
+import logo from "../../public/techvariety-logo.png";
 import { ExternalLink, Github, ShoppingBag, Twitter, Youtube } from "lucide-react";
+import Image from "next/image";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -11,13 +13,8 @@ export function Footer() {
           {/* Brand Col */}
           <div className="md:col-span-1">
             <Link href="/" className="flex items-center gap-2 mb-4">
-              <div className="bg-primary text-primary-foreground p-1.5 rounded-lg">
-                <ShoppingBag className="w-5 h-5" />
-              </div>
-              <span className="font-bold text-lg tracking-tight">
-                Tech<span className="text-primary">Variety</span>
-              </span>
-            </Link>
+              <Image src={logo} alt="TechVariety Logo" className="w-32" />
+            </Link>import logo from "../../public/techvariety-logo.png";
             <p className="text-muted-foreground text-sm mb-6 max-w-xs">
               Your trusted source for the best Amazon tech deals, reviews, and buying guides. Curated daily for tech enthusiasts.
             </p>

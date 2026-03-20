@@ -5,7 +5,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Search, X, ArrowRight, Clock, TrendingUp, Star, Loader2 } from "lucide-react";
-import { products, categories, blogPosts } from "@/lib/data";
+import { blogPosts } from "@/lib/data";
+import { getProducts, getCategories } from "@/lib/sanity";
+import { mapSanityProduct, mapSanityCategory } from "@/lib/sanityMapper";
 import { formatPrice } from "@/lib/utils";
 
 // ==========================================
@@ -48,19 +50,19 @@ function clearRecentSearches() {
   localStorage.removeItem(RECENT_KEY);
 }
 
-function searchAll(query: string): SearchResult[] {
+function searchAll(query: string, products: any[], categories: any[]): SearchResult[] {
   const q = query.toLowerCase().trim();
   if (!q) return [];
 
   const results: SearchResult[] = [];
 
-  // Search products
-  products.forEach((p) => {
+  // Search products (Sanity data, already mapped)
+  products.forEach((p: any) => {
     const match =
       p.title.toLowerCase().includes(q) ||
       p.brand.toLowerCase().includes(q) ||
       p.category.toLowerCase().includes(q) ||
-      p.description.toLowerCase().includes(q);
+      (p.description || "").toLowerCase().includes(q);
     if (match) {
       results.push({
         id: p.id,
@@ -75,9 +77,9 @@ function searchAll(query: string): SearchResult[] {
     }
   });
 
-  // Search categories
-  categories.forEach((c) => {
-    if (c.name.toLowerCase().includes(q) || c.description.toLowerCase().includes(q)) {
+  // Search categories (Sanity data, already mapped)
+  categories.forEach((c: any) => {
+    if (c.name.toLowerCase().includes(q) || (c.description || "").toLowerCase().includes(q)) {
       results.push({
         id: c.id,
         type: "category",
@@ -89,7 +91,7 @@ function searchAll(query: string): SearchResult[] {
     }
   });
 
-  // Search blog
+  // Search blog (still from dummy data)
   blogPosts.forEach((b) => {
     if (b.title.toLowerCase().includes(q) || b.excerpt.toLowerCase().includes(q)) {
       results.push({
@@ -130,9 +132,23 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const [isSearching, setIsSearching] = useState(false);
 
+  // Sanity data for search
+  const [sanityProducts, setSanityProducts] = useState<any[]>([]);
+  const [sanityCategories, setSanityCategories] = useState<any[]>([]);
+
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+
+  // Fetch Sanity data on first open
+  useEffect(() => {
+    if (sanityProducts.length === 0) {
+      Promise.all([getProducts(), getCategories()]).then(([rawProducts, rawCategories]) => {
+        setSanityProducts(rawProducts.map(mapSanityProduct).filter(Boolean));
+        setSanityCategories(rawCategories.map(mapSanityCategory).filter(Boolean));
+      });
+    }
+  }, []);
 
   // Load recent searches on open
   useEffect(() => {
@@ -155,12 +171,12 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
     }
     setIsSearching(true);
     const timer = setTimeout(() => {
-      setResults(searchAll(query));
+      setResults(searchAll(query, sanityProducts, sanityCategories));
       setActiveIndex(-1);
       setIsSearching(false);
     }, 150);
     return () => clearTimeout(timer);
-  }, [query]);
+  }, [query, sanityProducts, sanityCategories]);
 
   // Keyboard navigation
   const handleKeyDown = useCallback(

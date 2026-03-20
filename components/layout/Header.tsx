@@ -7,6 +7,9 @@ import { Menu, Search, ShoppingBag, X } from "lucide-react";
 import { ThemeSwitcher } from "../theme-switcher";
 import { Button } from "../ui/button";
 import { SearchModal } from "../ui/SearchModal";
+//import logo form public folder with this name techvariety-logo.png
+import logo from "../../public/techvariety-logo.png";
+import Image from "next/image";
 
 const mainNav = [
   { name: "Home", href: "/" },
@@ -59,12 +62,13 @@ export function Header() {
         <div className="container mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="bg-primary text-primary-foreground p-1.5 rounded-lg group-hover:bg-primary/90 transition-colors">
-              <ShoppingBag className="w-5 h-5" />
+            <div className="">
+              {/* <ShoppingBag className="w-5 h-5" /> */}
+              <Image src={logo} alt="TechVariety Logo" className=""  style={{maxWidth: '120px'}}/>
             </div>
-            <span className="font-bold text-lg tracking-tight">
+            {/* <span className="font-bold text-lg tracking-tight">
               Tech<span className="text-primary">Variety</span>
-            </span>
+            </span> */}
           </Link>
 
           {/* Desktop Navigation */}

@@ -15,8 +15,8 @@ export const revalidate = 60;
 export async function generateStaticParams() {
   const products = await getProducts();
   return products
-    .filter((p) => p.slug?.current)
-    .map((p) => ({
+    .filter((p: any) => p.slug?.current)
+    .map((p: any) => ({
       slug: p.slug.current,
     }));
 }
@@ -220,7 +220,7 @@ export default async function ProductPage({
           <section className="mb-16">
             <h2 className="text-2xl font-bold tracking-tight mb-6">Key Features</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {product.features.map((feature, i) => (
+              {product.features.map((feature: string, i: number) => (
                 <div
                   key={i}
                   className="flex items-start gap-3 p-4 bg-card border rounded-lg"
@@ -238,7 +238,7 @@ export default async function ProductPage({
           <section className="mb-16">
             <h2 className="text-2xl font-bold tracking-tight mb-6">Specifications</h2>
             <div className="border rounded-lg overflow-hidden">
-              {Object.entries(product.specs).map(([key, value], i) => (
+              {Object.entries(product.specs).map(([key, value]: [string, any], i: number) => (
                 <div
                   key={key}
                   className={`flex justify-between p-4 text-sm ${

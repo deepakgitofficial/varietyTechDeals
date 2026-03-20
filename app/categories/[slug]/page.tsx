@@ -8,13 +8,13 @@ export const revalidate = 60;
 export async function generateStaticParams() {
   const categories = await getCategories();
   return categories
-    .filter((c) => c.slug?.current)
-    .map((c) => ({
+    .filter((c: any) => c.slug?.current)
+    .map((c: any) => ({
       slug: c.slug.current,
     }));
 }
 
-export default async function CategoryPage({ params }) {
+export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
 
   const [rawCategory, rawProducts] = await Promise.all([

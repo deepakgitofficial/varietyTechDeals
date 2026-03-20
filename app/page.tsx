@@ -24,8 +24,8 @@ export default async function Home() {
   const products = rawProducts.map(mapSanityProduct).filter(Boolean);
   const categories = rawCategories.map(mapSanityCategory).filter(Boolean);
 
-  const featuredProducts = products.filter((p) => p.isPopular);
-  const newProducts = products.filter((p) => p.isNew);
+  const featuredProducts = products.filter((p: any) => p.isPopular);
+  const newProducts = products.filter((p: any) => p.isNew);
   const topPicks = products.slice(0, 3); // Top 3 for comparison
 
   return (
@@ -102,7 +102,7 @@ export default async function Home() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-            {categories.map((category) => (
+            {categories.map((category: any) => (
               <CategoryCard key={category.id} category={category} />
             ))}
           </div>
@@ -132,7 +132,7 @@ export default async function Home() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {featuredProducts.map((product) => (
+            {featuredProducts.map((product: any) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
@@ -177,7 +177,7 @@ export default async function Home() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {newProducts.map((product) => (
+            {newProducts.map((product: any) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>

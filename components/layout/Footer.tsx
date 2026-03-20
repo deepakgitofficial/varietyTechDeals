@@ -14,7 +14,7 @@ export function Footer() {
           <div className="md:col-span-1">
             <Link href="/" className="flex items-center gap-2 mb-4">
               <Image src={logo} alt="TechVariety Logo" className="w-32" />
-            </Link>import logo from "../../public/techvariety-logo.png";
+            </Link>
             <p className="text-muted-foreground text-sm mb-6 max-w-xs">
               Your trusted source for the best Amazon tech deals, reviews, and buying guides. Curated daily for tech enthusiasts.
             </p>

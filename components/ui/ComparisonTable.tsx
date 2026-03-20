@@ -49,7 +49,7 @@ export function ComparisonTable({ products }: ComparisonTableProps) {
         </thead>
         <tbody>
           {/* Price Row */}
-          <tr className="border-b">
+          {/* <tr className="border-b">
             <td className="p-4 text-sm font-medium">Price</td>
             {products.map((p) => (
               <td key={p.id} className="p-4 text-center">
@@ -61,7 +61,7 @@ export function ComparisonTable({ products }: ComparisonTableProps) {
                 )}
               </td>
             ))}
-          </tr>
+          </tr> */}
 
           {/* Rating Row */}
           <tr className="border-b bg-muted/30">

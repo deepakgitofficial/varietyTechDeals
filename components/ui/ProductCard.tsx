@@ -53,12 +53,12 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
         
         <div className="flex items-baseline gap-2 mt-auto">
-          <span className="text-xl font-bold">{formatPrice(product.price)}</span>
+          {/* <span className="text-xl font-bold">{formatPrice(product.price)}</span>
           {product.originalPrice && (
             <span className="text-sm text-muted-foreground line-through">
               {formatPrice(product.originalPrice)}
             </span>
-          )}
+          )} */}
         </div>
       </CardContent>
       

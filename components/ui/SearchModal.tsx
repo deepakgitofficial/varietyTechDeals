@@ -340,11 +340,11 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
 
                   {/* Price / Rating */}
                   <div className="flex items-center gap-3 flex-shrink-0">
-                    {result.price && (
+                    {/* {result.price && (
                       <span className="text-sm font-bold">
                         {formatPrice(result.price)}
                       </span>
-                    )}
+                    )} */}
                     {result.rating && (
                       <span className="flex items-center gap-1 text-xs text-muted-foreground">
                         <Star className="w-3 h-3 fill-primary text-primary" />

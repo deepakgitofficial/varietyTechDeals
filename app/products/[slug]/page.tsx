@@ -171,7 +171,7 @@ export default async function ProductPage({
 
             {/* Price */}
             <div className="flex items-baseline gap-3 mb-6">
-              <span className="text-4xl font-bold">{formatPrice(product.price)}</span>
+              {/* <span className="text-4xl font-bold">{formatPrice(product.price)}</span>
               {product.originalPrice && (
                 <>
                   <span className="text-xl text-muted-foreground line-through">
@@ -179,7 +179,7 @@ export default async function ProductPage({
                   </span>
                   <Badge variant="destructive">Save {formatPrice(product.originalPrice - product.price)}</Badge>
                 </>
-              )}
+              )} */}
             </div>
 
             <p className="text-muted-foreground mb-6 leading-relaxed">
@@ -312,7 +312,7 @@ export default async function ProductPage({
           <Button asChild size="lg" className="gap-2 text-base px-10">
             <a href={product.affiliateLink} target="_blank" rel="noopener noreferrer">
               <ExternalLink className="w-4 h-4" />
-              Buy on Amazon — {formatPrice(product.price)}
+              Buy on Amazon
             </a>
           </Button>
         </section>

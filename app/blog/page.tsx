@@ -47,7 +47,7 @@ export default async function BlogPage() {
     readTime: "5 min read",
     category: post.category || "Uncategorized",
   }));
-
+  console.log(mappedPosts, "mappedPostsmappedPosts");
   return (
     <div className="container mx-auto px-4 md:px-6 py-12 md:py-20">
       <div className="max-w-2xl mb-12">

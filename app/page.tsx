@@ -8,25 +8,43 @@ import { BlogCard } from "@/components/ui/BlogCard";
 import { Newsletter } from "@/components/ui/Newsletter";
 import { ComparisonTable } from "@/components/ui/ComparisonTable";
 import { Badge } from "@/components/ui/badge";
-import { getProducts, getCategories } from "@/lib/sanity";
+import { getProducts, getCategories, getLatestPosts } from "@/lib/sanity";
 import { mapSanityProduct, mapSanityCategory } from "@/lib/sanityMapper";
-import { blogPosts } from "@/lib/data";
+import { BlogPost } from "@/types";
 import { CategorySlider } from "@/components/ui/CategorySlider";
 
 
 
 
-export const revalidate = 60; // ISR: revalidate every 60 seconds
+export const revalidate = 300; // ISR: revalidate every 60 seconds
 
 export default async function Home() {
   // Fetch live data from Sanity
-  const [rawProducts, rawCategories] = await Promise.all([
+  const [rawProducts, rawCategories, rawPosts] = await Promise.all([
     getProducts(),
     getCategories(),
+    getLatestPosts(3),
   ]);
 
   const products = rawProducts.map(mapSanityProduct).filter(Boolean);
   const categories = rawCategories.map(mapSanityCategory).filter(Boolean);
+
+
+  const latestPosts: BlogPost[] = rawPosts.map((post: any) => ({
+    id: post._id,
+    title: post.title,
+    slug: post.slug,
+    excerpt: post.excerpt || "",
+    content: "",
+    image: post.image,
+    author: {
+      name: post.authorName || "Unknown Author",
+      avatar: post.authorAvatar || "/placeholder-avatar.png",
+    },
+    date: post.date ? new Date(post.date).toLocaleDateString("en-US", { month: 'short', day: 'numeric', year: 'numeric' }) : "",
+    readTime: "5 min read",
+    category: post.category || "Uncategorized",
+  }));
 
   const featuredProducts = products.filter((p: any) => p.isPopular);
   const newProducts = products.filter((p: any) => p.isNew);
@@ -192,8 +210,8 @@ export default async function Home() {
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex items-end justify-between mb-10">
             <div>
-              <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
-                From the Blog
+              <h2 className="text-3xl md:text-4xl font-bold tracking-tight uppercase">
+                LATEST BLOG POSTS
               </h2>
               <p className="text-muted-foreground mt-2">
                 Guides, reviews, and news to keep you informed.
@@ -207,7 +225,7 @@ export default async function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {blogPosts.map((post) => (
+            {latestPosts.map((post) => (
               <BlogCard key={post.id} post={post} />
             ))}
           </div>

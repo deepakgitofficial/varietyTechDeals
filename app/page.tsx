@@ -11,6 +11,10 @@ import { Badge } from "@/components/ui/badge";
 import { getProducts, getCategories } from "@/lib/sanity";
 import { mapSanityProduct, mapSanityCategory } from "@/lib/sanityMapper";
 import { blogPosts } from "@/lib/data";
+import { CategorySlider } from "@/components/ui/CategorySlider";
+
+
+
 
 export const revalidate = 60; // ISR: revalidate every 60 seconds
 
@@ -101,10 +105,9 @@ export default async function Home() {
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-            {categories.map((category: any) => (
-              <CategoryCard key={category.id} category={category} />
-            ))}
+          <div className="">
+            <CategorySlider categories={categories} />
+
           </div>
         </div>
       </section>

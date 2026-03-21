@@ -34,7 +34,6 @@ export async function generateMetadata({
   if (!product) {
     return { title: "Product Not Found" };
   }
-
   return {
     title: `${product.title} Review — Best Price`,
     description: product.description,
@@ -155,11 +154,10 @@ export default async function ProductPage({
                 {[...Array(5)].map((_, i) => (
                   <Star
                     key={i}
-                    className={`w-5 h-5 ${
-                      i < Math.floor(product.rating)
+                    className={`w-5 h-5 ${i < Math.floor(product.rating)
                         ? "fill-primary text-primary"
                         : "fill-muted text-muted"
-                    }`}
+                      }`}
                   />
                 ))}
               </div>
@@ -241,9 +239,8 @@ export default async function ProductPage({
               {Object.entries(product.specs).map(([key, value]: [string, any], i: number) => (
                 <div
                   key={key}
-                  className={`flex justify-between p-4 text-sm ${
-                    i % 2 === 0 ? "bg-muted/30" : ""
-                  } ${i < Object.keys(product.specs).length - 1 ? "border-b" : ""}`}
+                  className={`flex justify-between p-4 text-sm ${i % 2 === 0 ? "bg-muted/30" : ""
+                    } ${i < Object.keys(product.specs).length - 1 ? "border-b" : ""}`}
                 >
                   <span className="font-medium">{key}</span>
                   <span className="text-muted-foreground text-right">{value}</span>

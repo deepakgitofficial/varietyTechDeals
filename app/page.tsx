@@ -25,7 +25,7 @@ export default async function Home() {
     getCategories(),
     getLatestPosts(3),
   ]);
-
+console.log("Raw Products:", rawProducts);
   const products = rawProducts.map(mapSanityProduct).filter(Boolean);
   const categories = rawCategories.map(mapSanityCategory).filter(Boolean);
 
@@ -46,8 +46,21 @@ export default async function Home() {
     category: post.category || "Uncategorized",
   }));
 
-  const featuredProducts = products.filter((p: any) => p.isPopular);
-  const newProducts = products.filter((p: any) => p.isNew);
+  const featuredProducts = products.filter((p: any) =>
+    p.isPopular ||
+    p.badge?.includes("top_deal") ||
+    p.badge?.includes("best_seller") ||
+    p.badge?.includes("amazon_choice")
+  );
+
+  const newProducts = products.filter((p: any) =>
+    p.isNew ||
+    p.badge?.includes("new_arrival") ||
+    p.badge?.includes("trending")
+  );
+
+  const featuredProductsFallback = featuredProducts.length ? featuredProducts : products.slice(0, 8);
+  const newProductsFallback = newProducts.length ? newProducts : products.slice(0, 8);
   const topPicks = products.slice(0, 3); // Top 3 for comparison
 
   return (
@@ -153,7 +166,7 @@ export default async function Home() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {featuredProducts.map((product: any) => (
+            {featuredProductsFallback.map((product: any) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
@@ -197,8 +210,8 @@ export default async function Home() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {newProducts.map((product: any) => (
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {newProductsFallback.map((product: any) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>

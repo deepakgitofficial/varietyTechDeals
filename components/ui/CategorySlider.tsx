@@ -20,8 +20,8 @@ export function CategorySlider({ categories }: CategorySliderProps) {
       slidesPerView={1}
       breakpoints={{
         640: { slidesPerView: 2 },
-        1024: { slidesPerView: 3 },
-        1280: { slidesPerView: 5 },
+        1024: { slidesPerView: 5 },
+        1280: { slidesPerView: 6 },
       }}
       navigation
       pagination={{ clickable: true }}

@@ -28,6 +28,7 @@ export function CategoryCard({ category }: CategoryCardProps) {
           </div>
         </div>
       </Card>
+
     </Link>
   );
 }

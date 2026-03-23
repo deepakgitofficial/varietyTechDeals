@@ -515,15 +515,3 @@ export const blogPosts: BlogPost[] = [
     category: "Gaming",
   }
 ];
-
-export function getProductBySlug(slug: string): Product | undefined {
-  return products.find(p => p.slug === slug);
-}
-
-export function getProductsByCategory(category: string): Product[] {
-  return products.filter(p => p.category.toLowerCase() === category.toLowerCase());
-}
-
-export function getFeaturedProducts(): Product[] {
-  return products.filter(p => p.isPopular);
-}

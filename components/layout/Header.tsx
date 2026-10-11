@@ -8,7 +8,7 @@ import { ThemeSwitcher } from "../theme-switcher";
 import { Button } from "../ui/button";
 import { SearchModal } from "../ui/SearchModal";
 //import logo form public folder with this name techvariety-logo.png
-import logo from "../../public/techvariety-logo.png";
+import logo from "../../public/dpk-tech-small.jpg";
 import Image from "next/image";
 
 const mainNav = [
